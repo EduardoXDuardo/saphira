@@ -142,7 +142,6 @@ else:
 # Como os domínios são diferentes, é necessário permitir o envio de cookies
 if ENV == 'PRODUCTION':
     CORS_ALLOWED_ORIGINS = [
-        "http://localhost:3000",
         "https://semanadesi.com",
         "https://saphira.semanadesi.com",
         "https://co-dashboard.semanadesi.com",
