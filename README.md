@@ -411,6 +411,37 @@ Agora é possível testar as requisições HTTPS. Basta obter o DNS público do 
 > ```
 =======
 
+## Qualidade de Código
+
+O projeto utiliza ferramentas de qualidade de código para manter um padrão consistente e identificar problemas potenciais.
+
+### Ruff
+
+O projeto usa **Ruff** para linting e formatação de código. Ruff é um linter e formatador Python extremamente rápido.
+
+- **Verificar código (linting)**:
+  ```bash
+  uv run ruff check
+  ```
+
+- **Corrigir problemas automaticamente**:
+  ```bash
+  uv run ruff check --fix
+  ```
+
+- **Formatar código**:
+  ```bash
+  uv run ruff format
+  ```
+
+### Configuração
+
+As regras de linting estão configuradas no arquivo `pyproject.toml` e incluem:
+- Verificações de estilo de código (pycodestyle)
+- Detecção de bugs comuns (flake8-bugbear)
+- Ordenação de imports (isort)
+- Atualizações de sintaxe Python (pyupgrade)
+
 ## Testes
 
 Os testes em Django são realizados por meio da classe *TestCase*, importada do *django.test* que permite a realização de testes em ambiente isolado.

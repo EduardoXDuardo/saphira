@@ -33,7 +33,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 ENV PATH="/app/.venv/bin:$PATH"
 EXPOSE 8000
 
-CMD ["uv", "run", "manage.py", "runserver"]
+CMD ["uv", "run", "manage.py", "runserver", "0.0.0.0:8000"]
 
 #### BUILDER FOR PROD ####
 # Criamos uma nova imagem sem o uv, apenas o python, nosso código e as dependências
@@ -66,8 +66,15 @@ COPY --from=builder --chown=appuser:appuser /app /app
 # Adiciona nossas dependencias para o $PATH
 ENV PATH="/app/.venv/bin:$PATH"
 
+# Muda para usuário não-root
+USER appuser
+
 # Expoe a porta 8000 que será usada pelo saphira
 EXPOSE 8000
+
+# Healthcheck para monitoramento
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000').read()"
 
 # Rodamos em produção
 CMD [ "gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "saphira.wsgi:application" ]

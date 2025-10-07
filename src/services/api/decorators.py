@@ -1,5 +1,6 @@
 import datetime
 import json
+import logging
 from functools import wraps
 
 import firebase_admin
@@ -8,6 +9,8 @@ from django.conf import settings
 from django.http import JsonResponse
 from firebase_admin import auth
 from rest_framework_simplejwt.tokens import AccessToken
+
+logger = logging.getLogger(__name__)
 
 if not firebase_admin._apps:
     firebase_admin.initialize_app()
@@ -39,8 +42,18 @@ def firebase_auth_required(view_func):
 
                 request.META['HTTP_AUTHORIZATION'] = f'Bearer {str(jwt_token)}'
 
-            except Exception as e:
+            except auth.InvalidIdTokenError as e:
+                logger.warning(f"Invalid Firebase token: {e}")
                 return JsonResponse({'error': 'Invalid Firebase token.'}, status=401)
+            except auth.ExpiredIdTokenError as e:
+                logger.warning(f"Expired Firebase token: {e}")
+                return JsonResponse({'error': 'Firebase token has expired.'}, status=401)
+            except json.JSONDecodeError as e:
+                logger.warning(f"Invalid JSON in request body: {e}")
+                return JsonResponse({'error': 'Invalid request body.'}, status=400)
+            except Exception as e:
+                logger.error(f"Unexpected error in firebase_auth_required: {e}", exc_info=True)
+                return JsonResponse({'error': 'Authentication failed.'}, status=401)
 
             return view_func(request, *args, **kwargs)
 
