@@ -32,6 +32,9 @@ pip-delete-this-directory.txt
 # PyTest cache
 .pytest_cache/
 
+# Ruff cache
+.ruff_cache/
+
 # Coverage
 .coverage
 coverage.xml
@@ -43,6 +46,7 @@ coverage.xml
 
 # VirtualEnv
 venv/
+.venv/
 
 # Developers
 *.sw*
