@@ -110,9 +110,9 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 SESSION_COOKIE_NAME = 'sessionid'
 
 SESSION_COOKIE_DOMAIN = '.semanadesi.com' if ENV == 'PRODUCTION' else None
-SESSION_COOKIE_SECURE = True # Use True se estiver usando HTTPS
-SESSION_COOKIE_HTTPONLY = False
-SESSION_COOKIE_SAMESITE = 'None' # Necessário quando front e API estão em (sub)domínios diferentes
+SESSION_COOKIE_SECURE = True  # Use True se estiver usando HTTPS
+SESSION_COOKIE_HTTPONLY = False  # Deve ser False para permitir acesso via JavaScript se necessário
+SESSION_COOKIE_SAMESITE = 'None'  # Necessário quando front e API estão em (sub)domínios diferentes
 
 CSRF_COOKIE_DOMAIN = '.semanadesi.com' if ENV == 'PRODUCTION' else None
 CSRF_COOKIE_SECURE = True # Para proteger o CSRF token via HTTPS
@@ -120,9 +120,17 @@ CSRF_COOKIE_HTTPONLY = False # Não deve ser HttpOnly para funcionar com JavaScr
 CSRF_USE_SESSIONS = False
 
 CSRF_COOKIE_SAMESITE = 'None' #'Lax' ou 'Strict'
+
+# Security settings for production
+if ENV == 'PRODUCTION':
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 if ENV == 'PRODUCTION':
     CSRF_TRUSTED_ORIGINS = [
-        "http://localhost:3000",
         "https://semanadesi.com",
         "https://saphira.semanadesi.com",
         "https://co-dashboard.semanadesi.com",
@@ -257,3 +265,41 @@ STATIC_ROOT = BASE_DIR / "static"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Logging configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'services': {
+            'handlers': ['console'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': False,
+        },
+    },
+}
